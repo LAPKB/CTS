@@ -1,10 +1,11 @@
 
 
-
+library(dplyr)
 library(tidyr)
 library(ggplot2)
 library(Pmetrics)
-
+library(openxlsx)
+library(readr)
 
 # FUNCTIONS ---------------------------------------------------------------
 
@@ -106,8 +107,29 @@ testBE(cmax_ref,cmax_gen2,paired=T) #no, not BE
 
 
 #try with buproprion data
+sr <- read.xlsx("Bup150SR.xlsx",na.strings=".") %>% 
+  pivot_longer(cols=-time,names_to = "id", values_to = "conc") %>%
+  arrange(id,time) %>% 
+  select(id,time,conc) %>% 
+  filter(!is.na(conc))
+
+xl<- read.xlsx("Bup150XL.xlsx",na.strings=".") %>% 
+  pivot_longer(cols=-time,names_to = "id", values_to = "conc") %>%
+  arrange(id,time) %>% 
+  select(id,time,conc) %>% 
+  filter(!is.na(conc))
 
 
+
+
+srAUC <- getAUC(data.frame(sr))
+xlAUC <- getAUC(data.frame(xl))
+
+srAUC <- srAUC[srAUC$id %in% xlAUC$id,]
+xlAUC <- xlAUC[xlAUC$id %in% srAUC$id,]
+
+
+testBE(xlAUC$tau,srAUC$tau,paired=T) #yes, BE
 
 
 #2x2 parallel
