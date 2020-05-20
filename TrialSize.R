@@ -79,7 +79,7 @@ auc_gen2 <- getAUC(gen2)
 
 #overall check
 #CI should be [-0.2, 0.2]
-t.test(log10(auc_ref$tau),log10(auc_gen1$tau),paired=T) #yes, BE
-t.test(log10(auc_ref$tau),log10(auc_gen2$tau),paired=T) #no, not BE
+t.test(log10(auc_ref$tau),log10(auc_gen1$tau),paired=T,conf.level=0.9) #yes, BE
+t.test(log10(auc_ref$tau),log10(auc_gen2$tau),paired=T,conf.level=0.9) #no, not BE
 
 
