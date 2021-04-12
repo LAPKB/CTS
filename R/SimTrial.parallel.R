@@ -27,8 +27,8 @@ testBE <- function(ref,comp,paired){
 }
 
 # Read in NPOD data files
-ref=read.csv(file="ref_data.csv", sep=",")
-gen1=read.csv(file="test_data.csv", sep=",")
+ref=read.csv(file="data/ref_data.csv", sep=",")
+gen1=read.csv(file="data/test_data.csv", sep=",")
 
 # strip occasion, adjust column names
 ref=ref[,-4]; names(ref) = c("id", "time", "conc") 
