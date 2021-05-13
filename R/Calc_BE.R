@@ -1,20 +1,54 @@
-
-
-
+#' Generates bioequivalence statistics 
+#'
+#' Generates BE statistics for parallel, cross-over and full replication designs.
+#' From simulated data with 1000 subjects per drug, the function first calculates 
+#' area under the concentration-time curve (AUC) and maximum concentration (Cmax) 
+#' for each simulated profiles. Periods are defined as >1 for each replicated
+#' administration (e.g., when intra-occasion varibility is simulated.) 
+#' Linear regression (\code{\link{lm}}) is used on \code{log10(auc)} and \code{log10(cmax)}
+#' for parallel and cross-over designs, and mixed effect modeling (\code{\link{lmer}})
+#' is used for the replicated design. 
+#'
+#' @title Calculation of BE statistics
+#' @param data A dataframe or tibble  with these columns:
+#' subject id, time, concentrations, period, drug.
+#' @param n_trials Integer coding the number of random trials per sample size.
+#' @param subj_min Integer defining the minimum number of subjects per trial
+#' @param subj_max Integer defining the maximum number of subjects per trial
+#' @param subj_step Integer defining the step size between \code{subj_min} and
+#' \code{subj_max}, so that the program will test sample sizes 
+#' \emph{N = \{subj_min, subj_min + subj_step, subj_min + 2*subj_step,...,subj_max\}}.
+#' @param seed Random number seed.
+#' @return A list of lists: \[\[1:n_samp\]\]\[\[1:\code{n_trials}\]\]\[\[$par, $cross, 
+#' $rep\]\]\[\[1,2]\], where n_samp is the number of sample sizes tested, e.g., 
+#' (\code{subj_max} - \code{subj-min}) / \code{subj_step}.  The first item in the 
+#' design is auc, and the second is cmax.  For example the comparison of auc using 
+#' the third trial of the second sample size for the replicated design would be 
+#' x\[\[2\]\]\[\[3\]\]$rep\[\[1\]\].
+#' @seealso \code{\link{extractBE}}, \code{\link{plotBE}}
+#' @author Michael Neely
 #' @export
-#' 
-calc_be <- function(x, design = "all", 
-                    n = seq(from = 5, to  = 25, by = 5),
+
+
+calc_be <- function(data, 
                     n_trials = 50, 
                     subj_min = 5, subj_max = 50, subj_step = 5, 
-                    seed = 110321
-){
+                    seed = -17, ci_lcut=.8, ci_ucut=1.25){
+  
+  #make auc/cmax object from the data
+  data2 <- data %>% mutate(id2 = id, id = interaction(id2,per,drug))
+  aucV <- get_AUC(data2)$tau
+  cmaxV <- get_Cmax(data2)$cmax
+  data3 <- data2 %>% group_by(id) %>% distinct(id,.keep_all=T) %>%
+    mutate(id=id2) %>% add_column(auc = aucV, cmax = cmaxV) %>%
+    select(id,auc,cmax,per,drug)
+  
   #extract data
-  periods <- unique(x$per)
+  periods <- unique(data3$per)
   n_pers <- length(periods) #each period is a replicate for that drug
-  drugs <- unique(x$drug)
+  drugs <- unique(data3$drug)
   n_drugs <- length(drugs)
-  n_curves <- x %>% group_by(per, drug) %>%
+  n_curves <- data3 %>% group_by(per, drug) %>%
     summarize(N = n()) #number of profiles (IDs) per condition 
   n_curves <- n_curves$N[1] #assume the same per condition
   
@@ -23,77 +57,59 @@ calc_be <- function(x, design = "all",
   set.seed(seed)
   
   
-  if(design == "parallel" | design == "crossover" | design == "all"){
-    pBE_para <- up_s <- up_ss <- lo_s <- lo_ss <- rep(0, n_samp)
-    
-    for (i in 1:n_samp) {
-      for (b in 1:n_trials) {
-        this_list <- list()
-        for(j in 1:n_drugs){
-          this_list[[j]] <- x %>% filter(per==1 & drug==drugs[j]) %>%
-            slice_sample(n = n_subj[i])
-        }
-        this_df <- this_list %>% map_dfr(~as_tibble(.))
-        
-        
-        res <- t.test(log10(auc)~drug,this_df,paired=F,conf.level = 0.9)
-        this_lo <- 10^res$conf.int[1]
-        this_up <- 10^res$conf.int[2]
-        
-        if (this_lo >= 0.8 & this_up <= 1.25) {
-          pBE_para[i] <- pBE_para[i] + 1
-        }
-        lo_s[i] <- lo_s[i] + this_lo
-        lo_ss[i] <- lo_ss[i] + lo_s[i]^2
-        up_s[i] <- up_s[i] + this_up
-        up_ss[i] <- up_ss[i] + up_s[i]^2
-        
-      }
+  #simulate
+  
+  ctrl <- lme4::lmerControl(optimizer ="Nelder_Mead")
+  
+  get_lmer <- function(n){
+    #set up progress bar
+    pb <- progressr::progressor(along = 1:n_trials, message = paste0("Sample size = ", n ))
+    this_samp <- function(i){
+      #create subset with n random individuals by drug for parallel design
+      par_df <- data3 %>%
+        group_by(drug) %>%
+        filter(per=="1") %>%
+        slice_sample(n=n)
+      
+      #create subset with the same n random individuals by drug, period
+      #for replicate (all periods) and cross-over (period 1 only)
+      to_keep <- sample(n_curves,n) #replace=F by default  
+      rep_df <- data3 %>% 
+        group_by(drug, per) %>%
+        slice(to_keep) 
+      
+      cross_df <- rep_df %>% filter(per=="1" )
+      
+      lmPar <- list() #for parallel
+      lmCross <- list() #for crossover
+      lmerRep <- list() #for replicate
+      lmPar[[1]] <- suppressWarnings(lm(log10(auc) ~  drug, data = par_df)) 
+      lmPar[[2]] <- suppressWarnings(lm(log10(cmax) ~  drug, data = par_df)) 
+      lmCross[[1]] <- suppressWarnings(lm(log10(auc) ~  drug, data = cross_df)) 
+      lmCross[[2]] <- suppressWarnings(lm(log10(cmax) ~  drug, data = cross_df)) 
+      #if(n_pers>1) {
+        lmerRep[[1]] <- suppressWarnings(lmerTest::lmer(log10(auc) ~  per + drug + (1 | id), data = rep_df, control=ctrl)) 
+        lmerRep[[2]] <- suppressWarnings(lmerTest::lmer(log10(cmax) ~  per + drug + (1 | id), data = rep_df, control=ctrl)) 
+      # } else {
+      #   lmerRep[[1]] <- NA
+      #   lmerRep[[2]] <- NA
+      # }
+      pb()
+      
+      return(list(par = lmPar, cross = lmCross, rep = lmerRep))
     }
     
-    pBE_para <- pBE_para / n_trials
-    lo_s_para <- lo_s/n_trials
-    lo_ss_para <- lo_ss/n_trials
-    up_s_para <- up_s/n_trials
-    up_ss_para <- up_ss/n_trials
+    res <- map(1:n_trials, this_samp)
     
-    return(list(pBE_para = pBE_para, lo_s_para = lo_s_para, up_s_para = up_s_para))
+    return(res)
     
-  } #end parallel
+  } 
+  #do the simulation
+  res_list <- map(n_subj,get_lmer)
+  #[[1:n_samp]][[1:n_trials]][[$par, $cross, $rep]][[auc, cmax]]
   
-  if(design == "replicate" | design == "all"){
-    
-    #ctrl1 <- lmeControl(opt='optim', msMaxIter=1000)
-    ctrl <- lmerControl(optimizer ="Nelder_Mead")
-    
-    ci_lcut=.8; ci_ucut=1.25 # lower and upper cutoffs for CI
-    
-    #function to simulate for replicate designs
-    get_lmer <- function(n,par){
-      this_samp <- function(i){
-        to_keep <- sample(n_curves,n)
-        this_df <- x %>% 
-          group_by(drug, per) %>%
-          slice(to_keep)
-        
-        if(par=="auc"){
-          target_lmer <- lmer(log10(auc) ~  per + drug + (1 | id), data = this_df, control=ctrl) 
-        } else {
-          target_lmer <- lmer(log10(cmax) ~  per + drug + (1 | id), data = this_df, control=ctrl) 
-        }
-        return(target_lmer)
-      }
-      
-      res <-  map(1:n_trials, this_samp)
-      return(res)
-    } 
-    #do the simulation
-    res_auc <- map(n_subj,get_lmer,"auc")
-    res_cmax <- map(n_subj,get_lmer,"cmax")
-    return(list(auc = res_auc, cmax = res_cmax))
-  
-  } # end replication
-  
+  #return all objects
+  return(res_list)
   
 } #end function
 

@@ -1,12 +1,13 @@
-#tidyverse
 
-
-#read data
-#data format should be subject, time, conc, sequence, period, drug
-#expected number 1000 per condition, with 2 sequences, and 4 periods
-#total is 8000 concentrations per time point
-
+#' Read data file for BE simulations
+#' 
+#' Read a csv file whose format should be subject id, time, conc, period, drug.
+#' 
+#' @param name Name of the data file.
+#' @return A tibble.
+#' @author Michael Neely
 #' @export
+
 get_data <- function(name){
   return(read_csv(name,col_names = c("id","time","conc","seq","per","drug"),
                   col_types = "fddfff",
@@ -15,26 +16,33 @@ get_data <- function(name){
          )
 }
 
-#calculate AUC
-
+#' Calculate AUC
+#' 
+#' Calculate AUC using trapezoidal approximation from tibble read 
+#' by \code{\link{get_data}}.
+#' 
+#' @param x An appropriate tibble.
+#' @return A tibble with id and auc.
+#' @author Michael Neely
 #' @export
-get_auc <- function(x){
-  return(makeAUC(x,conc~time))
+
+get_AUC <- function(x){
+  return(Pmetrics::makeAUC(x,conc~time))
 }
 
-#get Cmax
-
+#' Extract Cmax
+#' 
+#' Extract Cmax from tibble read by \code{\link{get_data}}.
+#' 
+#' @param x An appropriate tibble.
+#' @return A tibble with id and cmax.
+#' @author Michael Neely
 #' @export
-get_cmax <- function(x){
- return(tapply(x$conc,x$id,max))
 
+get_Cmax <- function(x){
+  df <- x %>% group_by(id) %>%
+    summarize(cmax = max(conc))
+ return(df)
 }
 
 
-#Test BE for parallel design
-
-# '@export
-test_parallel <- function(stat,drug,paired){
-  t_res <- t.test(log10(stat)~drug, paired = paired, conf.level = 0.9)
-  return(10**t_res$conf.int)
-}

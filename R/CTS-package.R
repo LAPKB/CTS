@@ -11,17 +11,15 @@
 #' @keywords package
 #'
 #' @importFrom readr read_csv
-#' @importFrom Pmetrics makeAUC
-#' @importFrom nlme lmeControl lme
-#' @importFrom ggplot2 ggplot
-#' #' @importFrom dplyr select arrange filter mutate transmute group_by row_number
-#' @importFrom foreach %dopar%
+#' @importFrom dplyr select arrange filter mutate transmute group_by row_number
+#' distinct summarize n slice_sample slice across
 #' @importFrom ggplot2 ggplot aes geom_line geom_point geom_polygon 
 #' scale_x_log10 scale_x_continuous scale_y_log10 scale_y_continuous xlab ylab
-#' theme ggtitle element_blank
-#' @importFrom purrr map reduce map_chr keep pluck %>% 
-#' @importFrom tibble as_tibble
+#' theme ggtitle element_blank geom_errorbar geom_hline geom_ribbon labs
+#' @importFrom purrr map reduce map_chr keep pluck %>% flatten map_dfr
+#' @importFrom tibble as_tibble add_column 
 #' @importFrom tidyr pivot_longer pivot_wider unnest extract separate fill
+#' @importFrom tidyselect matches everything
 #' @importFrom grDevices col2rgb dev.off devAskNewPage gray.colors jpeg 
 #' pdf png postscript rgb setEPS
 #' @importFrom graphics abline arrows axTicks axis boxplot hist legend lines 
@@ -31,11 +29,12 @@
 #' get_all_vars glm kmeans kruskal.test ks.test
 #' lm median model.frame pchisq pnorm predict
 #' pt qchisq qnorm qqline qqnorm qqplot qt
-#' quantile rnorm runif sd shapiro.test step
+#' quantile rlnorm rnorm runif sd shapiro.test step
 #' t.test terms time var weighted.mean wilcox.test
 #' @importFrom utils compareVersion data flush.console glob2rx head 
 #' install.packages news packageVersion read.table setTxtProgressBar str
 #' tail txtProgressBar write.csv write.table
+
 
 NULL
 

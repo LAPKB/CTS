@@ -1,16 +1,37 @@
 Package: CTS
-Title: What the Package Does (One Line, Title Case)
+Title: Bioequivalence Clinical Trial Simulator
 Version: 0.0.0.9000
 Authors@R: 
-    person(given = "First",
-           family = "Last",
+    person(given = "Michael",
+           family = "Neely",
            role = c("aut", "cre"),
-           email = "first.last@example.com",
-           comment = c(ORCID = "YOUR-ORCID-ID"))
-Description: What the package does (one paragraph).
-License: `use_mit_license()`, `use_gpl3_license()` or friends to
-    pick a license
+           email = "mneely@usc.edu"
+           )
+Description: Generates BE statistics for differing sample sizes using simulated data.
+License: GPL (>= 3)
 Encoding: UTF-8
 LazyData: true
 Roxygen: list(markdown = TRUE)
-RoxygenNote: 7.0.2
+RoxygenNote: 7.1.1
+Date: 2020-06-12
+Depends: 
+    R (>= 4.0.0)
+Imports:
+    dplyr,
+    ggplot2,
+    lme4,
+    lmerTest,
+    Matrix,
+    methods,
+    Pmetrics,
+    progressr,
+    purrr,
+    readr,
+    rlang,
+    stats,
+    tibble,
+    tidyr,
+    tidyselect,
+    utils
+Suggests:
+    testthat
