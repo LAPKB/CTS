@@ -25,7 +25,8 @@ plotBE <- function(x,type, ci_lo = 0.8, ci_up = 1.25, ylab){
     
     p <- x %>% plot_ly(x = ~n_subj) %>%
       add_ribbons(ymin = ~ci_lo, ymax = ~ci_up, color = I("dodgerblue"), alpha = 0.2, name = "CI",
-                  hovertemplate = paste0("<extra></extra>","%{y:.2f}"))  %>%
+                  hovertemplate = paste0("<extra></extra>","%{y:.2f}"),
+                  span = I(0.7))  %>%
       add_trace(type = "scatter", mode="lines+markers", name = "Ratio",
                 y = ~de_ratio, size = I(30), color = I("black"), line = list(width =I(1)),
                 hovertemplate = paste0("<extra></extra>","N: %{x}", "<br>Ratio: %{y:.2f}")) %>%
@@ -51,7 +52,8 @@ plotBE <- function(x,type, ci_lo = 0.8, ci_up = 1.25, ylab){
     # plotly version
     p <- x %>% plot_ly(x = ~n_subj) %>%
       add_ribbons(ymin = ymin_auc, ymax = ymax_auc, color = I("dodgerblue"), alpha = 0.2, name = "CI",
-                  hovertemplate = paste0("<extra></extra>","%{y:.2f}"))  %>%
+                  hovertemplate = paste0("<extra></extra>","%{y:.2f}"),
+                  span = I(0.7))  %>%
       add_trace(type = "scatter", mode="lines+markers", name = "BE",
                 y = ~pBE_rep, size = I(30), color = I("black"), line = list(width =I(1)),
                 hovertemplate = paste0("<extra></extra>","N: %{x}", "<br>Prob: %{y:.2f}")) %>%

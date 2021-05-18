@@ -39,7 +39,7 @@ plotQ(s2)
 
 res2 <- calc_be(s2)
 
-ext_res2 <- extractBE(res)
+ext_res2 <- extractBE(res2)
 
 plotBE(ext_res2$auc_par, type="ratio")
 plotBE(ext_res2$cmax_par, type="ratio")
