@@ -29,3 +29,11 @@ plotBE(ext_res$auc_rep, type="pBE")
 plotBE(ext_res$cmax_rep, type="pBE")
 
 
+rmarkdown::render("inst/report/BEreport.Rmd", params = list(be=ext_res))
+
+
+
+s2 <- get_data("~/LAPK/Pmetrics/Buproprion/src/all_data.csv")
+res2 <- calc_be(s2)
+
+ext_res <- extractBE(res)

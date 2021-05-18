@@ -80,20 +80,17 @@ calc_be <- function(data,
       
       cross_df <- rep_df %>% filter(per=="1" )
       
-      lmPar <- list() #for parallel
-      lmCross <- list() #for crossover
-      lmerRep <- list() #for replicate
+      lmPar <- list(rep(NA,2)) #for parallel
+      lmCross <- list(rep(NA,2)) #for crossover
+      lmerRep <- list(rep(NA,2)) #for replicate
       lmPar[[1]] <- suppressWarnings(lm(log10(auc) ~  drug, data = par_df)) 
       lmPar[[2]] <- suppressWarnings(lm(log10(cmax) ~  drug, data = par_df)) 
       lmCross[[1]] <- suppressWarnings(lm(log10(auc) ~  drug, data = cross_df)) 
       lmCross[[2]] <- suppressWarnings(lm(log10(cmax) ~  drug, data = cross_df)) 
-      #if(n_pers>1) {
+      if(n_pers>1) {
         lmerRep[[1]] <- suppressWarnings(lmerTest::lmer(log10(auc) ~  per + drug + (1 | id), data = rep_df, control=ctrl)) 
         lmerRep[[2]] <- suppressWarnings(lmerTest::lmer(log10(cmax) ~  per + drug + (1 | id), data = rep_df, control=ctrl)) 
-      # } else {
-      #   lmerRep[[1]] <- NA
-      #   lmerRep[[2]] <- NA
-      # }
+      } 
       pb()
       
       return(list(par = lmPar, cross = lmCross, rep = lmerRep))

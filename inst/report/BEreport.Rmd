@@ -1,0 +1,41 @@
+---
+title: "BE Report"
+output: 
+  flexdashboard::flex_dashboard:
+    orientation: columns
+    vertical_layout: scroll
+    theme: bootstrap
+params:
+  be: !r ext_res
+---
+
+```{r setup, include=FALSE}
+library(flexdashboard)
+```
+
+Column {.tabset .tabset-fade}
+-----------------------------------------------------------------------
+
+### Chart A
+
+```{r}
+library(CTS)
+## AUC
+plotBE(params$be$auc_par, type="ratio")
+## Cmax
+plotBE(ext_res$cmax_par, type="ratio")
+
+```
+
+### Chart B
+
+```{r}
+
+```
+
+### Chart C
+
+```{r}
+
+```
+
