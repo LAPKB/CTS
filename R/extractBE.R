@@ -23,6 +23,7 @@ extractBE <- function(lmer_res, ci = 0.9, ci_lcut = 0.8, ci_ucut = 1.25){
   
   n_samp <- length(lmer_res)
   n_trials <- length(lmer_res[[1]])
+  rep_design <- lmer_res[[1]][[1]]$rep[[1]][1]
   
   get_summary <- function(design,index){
     pb <- progressr::progressor(along = 1:length(flatten(lmer_res)), message = 
@@ -48,7 +49,7 @@ extractBE <- function(lmer_res, ci = 0.9, ci_lcut = 0.8, ci_ucut = 1.25){
       } 
       
       if(design == 3){ #replicate
-        if(!is.na(this_lmer)){
+        # if(!is.na(this_lmer)){
           sum_lmer <- summary(this_lmer)$coefficients
           n_subj <- summary(this_lmer)$ngrps
           dd_eff <- sum_lmer[3,1] #drug effect
@@ -62,14 +63,14 @@ extractBE <- function(lmer_res, ci = 0.9, ci_lcut = 0.8, ci_ucut = 1.25){
           
           mse <- 2*(deltaCI/((sqrt(2/n_subj) * qt(.05, 2*n_subj-2, lower.tail=FALSE))))^2
           cv_intra <- sqrt(exp(mse)-1)
-        } else { #replicate is missing
-          de_ratio <- NA
-          ci_lo <- NA
-          ci_up <- NA
-          cv_intra <- NA
-          pBE_rep <- NA
-          n_subj <- NA
-        }
+        # } else { #replicate is missing
+        #   de_ratio <- NA
+        #   ci_lo <- NA
+        #   ci_up <- NA
+        #   cv_intra <- NA
+        #   pBE_rep <- NA
+        #   n_subj <- NA
+        # }
         
         pb()
         
@@ -93,8 +94,14 @@ extractBE <- function(lmer_res, ci = 0.9, ci_lcut = 0.8, ci_ucut = 1.25){
   cmax_par <- get_summary(1,2)
   auc_cross <- get_summary(2,1)
   cmax_cross <- get_summary(2,2)
-  auc_rep <- get_summary(3,1)
-  cmax_rep <- get_summary(3,2)
+  if(!is.na(rep_design)){
+    auc_rep <- get_summary(3,1)
+    cmax_rep <- get_summary(3,2)
+  } else {
+    auc_rep <- NA
+    cmax_rep <- NA
+  }
+
     
   return(list(auc_par = auc_par, cmax_par = cmax_par, 
               auc_cross = auc_cross, cmax_cross = cmax_cross, 

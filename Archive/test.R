@@ -34,6 +34,21 @@ rmarkdown::render("inst/report/BEreport.Rmd", params = list(be=ext_res))
 
 
 s2 <- get_data("~/LAPK/Pmetrics/Buproprion/src/all_data.csv")
+
+plotQ(s2)
+
 res2 <- calc_be(s2)
 
-ext_res <- extractBE(res)
+ext_res2 <- extractBE(res)
+
+plotBE(ext_res2$auc_par, type="ratio")
+plotBE(ext_res2$cmax_par, type="ratio")
+plotBE(ext_res2$auc_cross, type="ratio")
+plotBE(ext_res2$cmax_cross, type="ratio")
+
+
+plotBE(ext_res2$auc_par, type="pBE")
+plotBE(ext_res2$cmax_par, type="pBE")
+plotBE(ext_res2$auc_cross, type="pBE")
+plotBE(ext_res2$cmax_cross, type="pBE")
+
