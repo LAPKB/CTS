@@ -12,7 +12,7 @@
 #'
 #' @importFrom readr read_csv
 #' @importFrom dplyr select arrange filter mutate transmute group_by row_number
-#' distinct summarize n slice_sample slice across
+#' distinct summarize n slice_sample slice across ungroup
 #' @importFrom ggplot2 ggplot aes geom_line geom_point geom_polygon 
 #' scale_x_log10 scale_x_continuous scale_y_log10 scale_y_continuous xlab ylab
 #' theme ggtitle element_blank geom_errorbar geom_hline geom_ribbon labs
