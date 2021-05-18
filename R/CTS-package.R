@@ -34,7 +34,7 @@
 #' @importFrom utils compareVersion data flush.console glob2rx head 
 #' install.packages news packageVersion read.table setTxtProgressBar str
 #' tail txtProgressBar write.csv write.table
-#' @importFrom plotly plot_ly add_marker add_trace layout add_ribbons hide_legend
+#' @importFrom plotly plot_ly add_trace layout add_ribbons hide_legend
 
 
 NULL
