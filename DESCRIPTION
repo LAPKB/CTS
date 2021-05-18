@@ -23,6 +23,7 @@ Imports:
     lmerTest,
     Matrix,
     methods,
+    plotly,
     Pmetrics,
     progressr,
     purrr,
