@@ -23,7 +23,7 @@ extractBE <- function(lmer_res, ci = 0.9, ci_lcut = 0.8, ci_ucut = 1.25){
   
   n_samp <- length(lmer_res)
   n_trials <- length(lmer_res[[1]])
-  rep_design <- lmer_res[[1]][[1]]$rep[[1]][1]
+  rep_design <- inherits(lmer_res[[1]][[1]]$rep[[1]],"lmerModLmerTest")
   
   get_summary <- function(design,index){
     pb <- progressr::progressor(along = 1:length(flatten(lmer_res)), message = 
@@ -94,7 +94,7 @@ extractBE <- function(lmer_res, ci = 0.9, ci_lcut = 0.8, ci_ucut = 1.25){
   cmax_par <- get_summary(1,2)
   auc_cross <- get_summary(2,1)
   cmax_cross <- get_summary(2,2)
-  if(!is.na(rep_design)){
+  if(rep_design){
     auc_rep <- get_summary(3,1)
     cmax_rep <- get_summary(3,2)
   } else {
