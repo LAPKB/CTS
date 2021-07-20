@@ -19,7 +19,7 @@
 #' @seealso \code{\link{extractBE}}, \code{\link{plotBE}}
 #' @author Michael Neely
 #' @export
-extractBE <- function(lmer_res, ci = 0.9, ci_lcut = 0.8, ci_ucut = 1.25){
+extract_be <- function(lmer_res, ci = 0.9, ci_lcut = 0.8, ci_ucut = 1.25){
   
   n_samp <- length(lmer_res)
   n_trials <- length(lmer_res[[1]])
