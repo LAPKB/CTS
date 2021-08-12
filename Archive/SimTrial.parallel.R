@@ -9,26 +9,31 @@ library(Pmetrics)
 # FUNCTIONS ---------------------------------------------------------------
 
 #get AUC
+#'@export
 getAUC <- function(x){
   auc <- makeAUC(x,conc~time)
   return(auc)
 }
 
 #get Cmax
+#'@export
 getCmax <- function(x){
   cmax <- tapply(x$conc,x$id,max)
   return(cmax)
 }
 
+#'@export
 testBE <- function(ref,comp,paired){
   t_res <- t.test(log10(ref),log10(comp),paired=paired,conf.level=0.9)
   return(10**t_res$conf.int)
   
 }
 
+#TODO: we need to get this into functions
+
 # Read in NPOD data files
-ref=read.csv(file="ref_data.csv", sep=",")
-gen1=read.csv(file="test_data.csv", sep=",")
+ref=read.csv(file="data/ref_data.csv", sep=",")
+gen1=read.csv(file="data/test_data.csv", sep=",")
 
 # strip occasion, adjust column names
 ref=ref[,-4]; names(ref) = c("id", "time", "conc") 

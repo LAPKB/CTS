@@ -10,6 +10,7 @@ library(readr)
 # FUNCTIONS ---------------------------------------------------------------
 
 #simulate N time concentration curves
+#'@export
 simCurves <- function(N,meanPar,sdPar,dose){
   #parameters should be in log scale
   KE_mu<- meanPar[1]
@@ -30,29 +31,34 @@ simCurves <- function(N,meanPar,sdPar,dose){
 }
 
 #get AUC
+#'@export
 getAUC <- function(x){
   auc <- makeAUC(x,conc~time)
   return(auc)
 }
 
 #get Cmax
+#'@export
 getCmax <- function(x){
   cmax <- tapply(x$conc,x$id,max)
   return(cmax)
 }
 
 #add IOV
+#'@export
 addIOV <- function(x,iov){
   x$conc <- unlist(tapply(x$conc,x$id,function(h) h * exp(rnorm(1,mean=0,sd=iov))))
   return(x)
 }
 
+#'@export
 testBE <- function(ref,comp,paired){
   t_res <- t.test(log10(ref),log10(comp),paired=paired,conf.level=0.9)
   return(10**t_res$conf.int)
   
 }
 
+#TODO: get this into functions
 
 # MAKE PROFILES -----------------------------------------------------------
 
@@ -107,13 +113,13 @@ testBE(cmax_ref,cmax_gen2,paired=T) #no, not BE
 
 
 #try with buproprion data
-sr <- read.xlsx("Bup150SR.xlsx",na.strings=".") %>% 
+sr <- read.xlsx("data/Bup150SR.xlsx",na.strings=".") %>% 
   pivot_longer(cols=-time,names_to = "id", values_to = "conc") %>%
   arrange(id,time) %>% 
   select(id,time,conc) %>% 
   filter(!is.na(conc))
 
-xl<- read.xlsx("Bup150XL.xlsx",na.strings=".") %>% 
+xl<- read.xlsx("data/Bup150XL.xlsx",na.strings=".") %>% 
   pivot_longer(cols=-time,names_to = "id", values_to = "conc") %>%
   arrange(id,time) %>% 
   select(id,time,conc) %>% 

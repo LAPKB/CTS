@@ -1,0 +1,131 @@
+---
+title: "BE Report"
+output: 
+  flexdashboard::flex_dashboard:
+    orientation: rows
+    vertical_layout: scroll
+    theme: bootstrap
+params:
+  sim: !r "sim"
+  be: !r "be"
+---
+
+```{r setup, include=FALSE}
+library(flexdashboard)
+library(CTS)
+```
+Simulated Data
+=======================================================================
+
+```{r simplot}
+plotQ(params$sim)
+```
+
+Parallel Design
+=======================================================================
+Probability {.tabset .tabset-fade} 
+-----------------------------------------------------------------------
+
+### AUC
+
+Probability
+```{r aucParProb}
+plotBE(params$be$auc_par, type="pBE")
+```
+
+### Cmax
+
+Probability
+```{r cmaxParProb}
+plotBE(params$be$cmax_par, type="pBE")
+
+```
+
+Ratio {.tabset .tabset-fade} 
+-----------------------------------------------------------------------
+### AUC
+
+Ratio
+```{r aucParRatio}
+plotBE(params$be$auc_par, type="ratio")
+```
+
+### Cmax
+
+Ratio
+```{r cmaxParRatio}
+plotBE(params$be$cmax_par, type="ratio")
+
+```
+
+
+Cross-over Design
+=======================================================================
+Probability {.tabset .tabset-fade} 
+-----------------------------------------------------------------------
+### AUC
+
+Probability
+```{r aucCrossProb}
+plotBE(params$be$auc_cross, type="pBE")
+```
+
+### Cmax
+
+Probability
+```{r cmaxCrossProb}
+plotBE(params$be$cmax_cross, type="pBE")
+
+```
+
+Ratio {.tabset .tabset-fade} 
+-----------------------------------------------------------------------
+### AUC
+
+Ratio
+```{r aucCrossRatio}
+plotBE(params$be$auc_cross, type="ratio")
+```
+
+### Cmax
+
+Ratio
+```{r cmaxCrossRatio}
+plotBE(params$be$cmax_cross, type="ratio")
+
+```
+Replicate Design
+=======================================================================
+Probability {.tabset .tabset-fade} 
+-----------------------------------------------------------------------
+### AUC
+
+Probability
+```{r aucRepProb}
+plotBE(params$be$auc_rep, type="pBE")
+```
+
+### Cmax
+
+Probability
+```{r cmaxRepProb}
+plotBE(params$be$cmax_rep, type="pBE")
+
+```
+
+Ratio {.tabset .tabset-fade} 
+-----------------------------------------------------------------------
+### AUC
+
+Ratio
+```{r aucRepRatio}
+plotBE(params$be$auc_rep, type="ratio")
+```
+
+### Cmax
+
+Ratio
+```{r cmaxRepRatio}
+plotBE(params$be$cmax_rep, type="ratio")
+
+```
