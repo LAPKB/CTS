@@ -15,7 +15,7 @@ Roxygen: list(markdown = TRUE)
 RoxygenNote: 7.1.1
 Date: 2020-06-12
 Depends: 
-    R (>= 4.0.0)
+    R (>= 3.6.3)
 Imports:
     dplyr,
     ggplot2,
