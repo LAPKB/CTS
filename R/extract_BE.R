@@ -37,10 +37,10 @@ extract_be <- function(lmer_res, ci = 0.9, ci_lcut = 0.8, ci_ucut = 1.25){
         dd_eff <- sum_lm$coefficients[2,1] #drug effect
         se <- sum_lm$coefficients[2,2] #standard error
         df <- sum_lm$df[2] #degrees of freedom
-        de_ratio <- exp(dd_eff)
+        de_ratio <- 10**(dd_eff)
         deltaCI <- qt((1-ci)/2,df,lower.tail=FALSE)*se
-        ci_lo <- de_ratio*exp(-deltaCI)
-        ci_up <- de_ratio*exp(deltaCI)
+        ci_lo <- de_ratio*10**(-deltaCI)
+        ci_up <- de_ratio*10**(deltaCI)
         if ((ci_lo>=ci_lcut) & (ci_up<=ci_ucut)) {pBE_rep <- 1} else {pBE_rep <- 0}
         pb()
         
@@ -55,22 +55,15 @@ extract_be <- function(lmer_res, ci = 0.9, ci_lcut = 0.8, ci_ucut = 1.25){
           dd_eff <- sum_lmer[3,1] #drug effect
           se <- sum_lmer[3,2] #standard error
           df <- sum_lmer[3,3] #degrees of freedom
-          de_ratio <- exp(dd_eff)
+          de_ratio <- 10**(dd_eff)
           deltaCI <- qt(.05,df,lower.tail=FALSE)*se
-          ci_lo <- de_ratio*exp(-deltaCI)
-          ci_up <- de_ratio*exp(deltaCI)
+          ci_lo <- de_ratio*10**(-deltaCI)
+          ci_up <- de_ratio*10**(deltaCI)
           if ((ci_lo>=ci_lcut) & (ci_up<=ci_ucut)) {pBE_rep <- 1} else {pBE_rep <- 0}
           
           mse <- 2*(deltaCI/((sqrt(2/n_subj) * qt(.05, 2*n_subj-2, lower.tail=FALSE))))^2
-          cv_intra <- sqrt(exp(mse)-1)
-        # } else { #replicate is missing
-        #   de_ratio <- NA
-        #   ci_lo <- NA
-        #   ci_up <- NA
-        #   cv_intra <- NA
-        #   pBE_rep <- NA
-        #   n_subj <- NA
-        # }
+          cv_intra <- sqrt(exp(mse)-1) #not sure if this should change to 10**()
+
         
         pb()
         
